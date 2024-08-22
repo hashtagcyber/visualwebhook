@@ -41,7 +41,7 @@
 
   <div class="section">
     <p>Enter the URL:</p>
-    <input type="text" id="url-input" value="https://webhook.site/77cfe8ac-c51e-41cc-8f03-2f1dc7ff4781" placeholder="Enter the URL">
+    <input type="text" id="url-input" value="https://webhook.site/85648cc8-2aab-43b3-ad45-c225955838c3" placeholder="Enter the URL">
   </div>
 
   <div class="section">
@@ -83,64 +83,75 @@
   <script>
     // Function to create a cookie that never expires with the username "bob"
     function setCookie(name, value) {
-      const neverExpire = new Date();
-      neverExpire.setFullYear(neverExpire.getFullYear() + 100); // Set to 100 years from now
-      document.cookie = `${name}=${value}; expires=${neverExpire.toUTCString()}; path=/`;
+        const neverExpire = new Date();
+        neverExpire.setFullYear(neverExpire.getFullYear() + 100); // Set to 100 years from now
+        document.cookie = `${name}=${value}; expires=${neverExpire.toUTCString()}; path=/`;
     }
 
     // Set the cookie when the page loads
     window.onload = function() {
-      setCookie('username', 'bob');
+        setCookie('username', 'bob');
     };
 
     function sendRequest() {
-      const requestMethod = document.querySelector('input[name="request-method"]:checked').value;
-      const url = document.getElementById('url-input').value;
-      const requestBody = document.getElementById('request-body').value;
+        const requestMethod = document.querySelector('input[name="request-method"]:checked').value;
+        let url = document.getElementById('url-input').value;
+        const requestBody = document.getElementById('request-body').value;
 
-      const headerInputs = document.querySelectorAll('.header-input');
-      const headers = new Headers();
-      headerInputs.forEach(input => {
-        const headerName = input.querySelector('.header-name').value.trim();
-        const headerValue = input.querySelector('.header-value').value.trim();
-        if (headerName) {
-          headers.append(headerName, headerValue);
+        const headerInputs = document.querySelectorAll('.header-input');
+        const headers = {};
+        headerInputs.forEach(input => {
+            const headerName = input.querySelector('.header-name').value.trim();
+            const headerValue = input.querySelector('.header-value').value.trim();
+            if (headerName) {
+                headers[headerName] = headerValue;
+            }
+        });
+
+        console.log('Sending request:');
+        console.log('Method:', requestMethod);
+        console.log('URL:', url);
+        console.log('Headers:', headers);
+        console.log('Request Body:', requestBody);
+
+        const xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+
+        // Append request body as "data" URL parameter for GET requests
+        if (requestMethod === 'GET' && requestBody) {
+            url += (url.includes('?') ? '&' : '?') + 'data=' + encodeURIComponent(requestBody);
         }
-      });
 
-      console.log('Sending request:');
-      console.log('Method:', requestMethod);
-      console.log('URL:', url);
-      console.log('Headers:', Object.fromEntries(headers.entries()));
-      console.log('Request Body:', requestBody);
+        xhr.open(requestMethod, url, true);
 
-      let fetchUrl = url;
-      if (requestMethod === 'GET' && requestBody) {
-        fetchUrl = `${url}?data=${encodeURIComponent(requestBody)}`;
-      }
+        // Set headers
+        for (const header in headers) {
+            if (headers.hasOwnProperty(header)) {
+                xhr.setRequestHeader(header, headers[header]);
+            }
+        }
 
-      fetch(fetchUrl, {
-        mode: 'no-cors',
-        method: requestMethod,
-        headers: headers,
-        body: requestMethod === 'POST' ? requestBody : null
-      })
-      .then(response => {
-        console.log('Response received:');
-        console.log('Status:', response.status);
-        console.log('Status Text:', response.statusText);
-        console.log('Headers:', response.headers);
-        return response.text();
-      })
-      .then(data => {
-        console.log('Response data:', data);
-        document.getElementById('response-display').textContent = data;
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        document.getElementById('response-display').textContent = 'Error: ' + error.message;
-      });
+        // Handle the response
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                console.log('Response received:');
+                console.log('Status:', xhr.status);
+                console.log('Status Text:', xhr.statusText);
+                console.log('Response Text:', xhr.responseText);
+
+                document.getElementById('response-display').textContent = xhr.responseText;
+            }
+        };
+
+        xhr.onerror = function() {
+            console.error('Request failed');
+            document.getElementById('response-display').textContent = 'Error: Request failed';
+        };
+
+        // Send the request
+        xhr.send(requestMethod === 'POST' ? requestBody : null);
     }
-  </script>
+</script>
+
 </body>
 </html>
