@@ -130,24 +130,6 @@
                 xhr.setRequestHeader(header, headers[header]);
             }
         }
-
-        // Handle the response
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-                console.log('Response received:');
-                console.log('Status:', xhr.status);
-                console.log('Status Text:', xhr.statusText);
-                console.log('Response Text:', xhr.responseText);
-
-                document.getElementById('response-display').textContent = xhr.responseText;
-            }
-        };
-
-        xhr.onerror = function() {
-            console.error('Request failed');
-            document.getElementById('response-display').textContent = 'Error: Request failed';
-        };
-
         // Send the request
         xhr.send(requestMethod === 'POST' ? requestBody : null);
     }
