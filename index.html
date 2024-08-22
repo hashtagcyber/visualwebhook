@@ -81,6 +81,18 @@
   <pre id="response-display"></pre>
 
   <script>
+    // Function to create a cookie that never expires with the username "bob"
+    function setCookie(name, value) {
+      const neverExpire = new Date();
+      neverExpire.setFullYear(neverExpire.getFullYear() + 100); // Set to 100 years from now
+      document.cookie = `${name}=${value}; expires=${neverExpire.toUTCString()}; path=/`;
+    }
+
+    // Set the cookie when the page loads
+    window.onload = function() {
+      setCookie('username', 'bob');
+    };
+
     function sendRequest() {
       const requestMethod = document.querySelector('input[name="request-method"]:checked').value;
       const url = document.getElementById('url-input').value;
