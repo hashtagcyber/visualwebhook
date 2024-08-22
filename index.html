@@ -39,39 +39,13 @@
 <body>
   <h1>Simple Curl Replacement</h1>
 
-  <div class="section">
+  <div class="section" id="target-url">
     <p>Enter the URL:</p>
     <input type="text" id="url-input" value="https://webhook.site/77cfe8ac-c51e-41cc-8f03-2f1dc7ff4781" placeholder="Enter the URL">
   </div>
 
-  <div class="section">
-    <p>Headers:</p>
-    <div id="header-inputs">
-      <div class="header-input">
-        <input type="text" placeholder="Header Name" class="header-name">
-        <input type="text" placeholder="Header Value" class="header-value">
-      </div>
-      <div class="header-input">
-        <input type="text" placeholder="Header Name" class="header-name">
-        <input type="text" placeholder="Header Value" class="header-value">
-      </div>
-      <div class="header-input">
-        <input type="text" placeholder="Header Name" class="header-name">
-        <input type="text" placeholder="Header Value" class="header-value">
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <p>Select the request method:</p>
-    <input type="radio" name="request-method" id="get-method" value="GET" checked>
-    <label for="get-method">GET</label>
-    <input type="radio" name="request-method" id="post-method" value="POST">
-    <label for="post-method">POST</label>
-  </div>
-
-  <div class="section">
-    <p>Request body (for POST requests):</p>
+  <div class="section" id="message-content">
+    <p>Request Content</p>
     <textarea id="request-body"></textarea>
   </div>
 
@@ -94,36 +68,16 @@
     };
 
     function sendRequest() {
-      const requestMethod = document.querySelector('input[name="request-method"]:checked').value;
       const url = document.getElementById('url-input').value;
       const requestBody = document.getElementById('request-body').value;
 
-      const headerInputs = document.querySelectorAll('.header-input');
-      const headers = new Headers();
-      headerInputs.forEach(input => {
-        const headerName = input.querySelector('.header-name').value.trim();
-        const headerValue = input.querySelector('.header-value').value.trim();
-        if (headerName) {
-          headers.append(headerName, headerValue);
-        }
-      });
-
-      console.log('Sending request:');
-      console.log('Method:', requestMethod);
-      console.log('URL:', url);
-      console.log('Headers:', Object.fromEntries(headers.entries()));
-      console.log('Request Body:', requestBody);
-
       let fetchUrl = url;
-      if (requestMethod === 'GET' && requestBody) {
-        fetchUrl = `${url}?data=${encodeURIComponent(requestBody)}`;
-      }
+      fetchUrl = `${url}?data=${encodeURIComponent(requestBody)}`
 
       fetch(fetchUrl, {
         mode: 'no-cors',
-        method: requestMethod,
-        headers: headers,
-        body: requestMethod === 'POST' ? requestBody : null
+        method: 'GET',
+        body: null
       })
       .then(response => {
         console.log('Response received:');
